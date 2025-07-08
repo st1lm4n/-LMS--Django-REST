@@ -1,19 +1,20 @@
+import random
+from datetime import datetime, timedelta
+from decimal import Decimal
+
+from courses.models import Course, Lesson
 from django.core.management.base import BaseCommand
 from users.models import Payment, User
-from courses.models import Course, Lesson
-import random
-from decimal import Decimal
-from datetime import datetime, timedelta
 
 
 class Command(BaseCommand):
-    help = 'Fills payments table with test data'
+    help = "Fills payments table with test data"
 
     def handle(self, *args, **kwargs):
         users = User.objects.all()
         courses = Course.objects.all()
         lessons = Lesson.objects.all()
-        methods = ['cash', 'transfer']
+        methods = ["cash", "transfer"]
 
         for _ in range(50):
             user = random.choice(users)
@@ -38,7 +39,7 @@ class Command(BaseCommand):
                 paid_course=course,
                 paid_lesson=lesson,
                 amount=amount,
-                payment_method=random.choice(methods)
+                payment_method=random.choice(methods),
             )
 
-        self.stdout.write(self.style.SUCCESS('Successfully created payments'))
+        self.stdout.write(self.style.SUCCESS("Successfully created payments"))
