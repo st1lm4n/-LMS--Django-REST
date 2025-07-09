@@ -15,9 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+
 from courses.views import CourseViewSet, LessonListCreateAPIView, LessonRetrieveUpdateDestroyAPIView
 from users.views import UserViewSet
 
@@ -28,12 +31,11 @@ router.register(r'users', UserViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/users/', include(('users.urls', 'users'), namespace='users')),
+    path('api/courses/', include(('courses.urls', 'courses'), namespace='courses')),
     path('api/lessons/', LessonListCreateAPIView.as_view()),
     path('api/lessons/<int:pk>/', LessonRetrieveUpdateDestroyAPIView.as_view()),
 ]
-
-from django.conf import settings
-from django.conf.urls.static import static
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
