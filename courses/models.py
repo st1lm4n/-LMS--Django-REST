@@ -11,6 +11,16 @@ class Course(models.Model):
         null=True,
         related_name='courses_owned'
     )
+    permission_classes = [IsAuthenticated, IsModeratorOrOwner]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.groups.filter(name='moderators').exists():
+            return Course.objects.all()
+        return Course.objects.filter(owner=user)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class Lesson(models.Model):
@@ -25,3 +35,13 @@ class Lesson(models.Model):
         null=True,
         related_name='lessons_owned'
     )
+    permission_classes = [IsAuthenticated, IsModeratorOrOwner]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.groups.filter(name='moderators').exists():
+            return Course.objects.all()
+        return Course.objects.filter(owner=user)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
