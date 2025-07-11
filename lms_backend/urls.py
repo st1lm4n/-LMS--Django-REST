@@ -15,19 +15,21 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from courses.views import (
-    CourseViewSet,
-    LessonListCreateAPIView,
-    LessonRetrieveUpdateDestroyAPIView,
-)
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from users.views import PaymentViewSet, UserViewSet
+from rest_framework_simplejwt.views import TokenRefreshView
 
+from courses.views import (
+    CourseViewSet,
+    LessonListCreateAPIView,
+    LessonRetrieveUpdateDestroyAPIView,
+)
 from courses.views import CourseViewSet, LessonListCreateAPIView, LessonRetrieveUpdateDestroyAPIView
+from users.views import PaymentViewSet, UserViewSet
+from users.views import UserRegistrationAPIView, CustomTokenObtainPairView
 from users.views import UserViewSet
 
 router = DefaultRouter()
@@ -42,10 +44,9 @@ urlpatterns = [
     path('api/courses/', include(('courses.urls', 'courses'), namespace='courses')),
     path('api/lessons/', LessonListCreateAPIView.as_view()),
     path('api/lessons/<int:pk>/', LessonRetrieveUpdateDestroyAPIView.as_view()),
-    path("admin/", admin.site.urls),
-    path("api/", include(router.urls)),
-    path("api/lessons/", LessonListCreateAPIView.as_view()),
-    path("api/lessons/<int:pk>/", LessonRetrieveUpdateDestroyAPIView.as_view()),
+    path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/register/', UserRegistrationAPIView.as_view(), name='register'),
 ]
 
 from django.conf import settings
