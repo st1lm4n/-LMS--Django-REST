@@ -8,7 +8,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .filters import PaymentFilter
 from .models import Payment, User
+from .permissions import IsOwner
 from .serializers import PaymentSerializer, UserSerializer
+from .serializers import UserProfileSerializer, UserDetailSerializer
 from .serializers import UserRegistrationSerializer, CustomTokenObtainPairSerializer
 
 
@@ -22,6 +24,14 @@ class PaymentViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsOwner]
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            if self.request.user == self.get_object():
+                return UserDetailSerializer
+            return UserProfileSerializer
+        return UserSerializer
 
 
 class UserRegistrationAPIView(APIView):

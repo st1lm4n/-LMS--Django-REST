@@ -47,6 +47,20 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'first_name', 'city', 'avatar']
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    payment_history = PaymentHistorySerializer(many=True, read_only=True, source='payments')
+
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'first_name', 'last_name', 'phone', 'city', 'avatar', 'payment_history']
+
+
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True,
