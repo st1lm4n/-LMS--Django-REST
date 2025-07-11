@@ -72,6 +72,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email', 'password', 'password2', 'first_name', 'last_name', 'phone', 'city', 'avatar')
+        extra_kwargs = {
+            'email': {'required': True},
+        }
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -79,6 +82,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
+        # Используем кастомный менеджер для создания пользователя
         user = User.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password'],
