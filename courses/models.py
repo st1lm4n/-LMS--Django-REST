@@ -1,8 +1,8 @@
 from django.db import models
 from rest_framework.permissions import IsAuthenticated
 
-from .validators import validate_youtube_link
 from .permissions import IsModeratorOrOwner
+from .validators import validate_youtube_link
 
 
 class Course(models.Model):
@@ -53,3 +53,22 @@ class Lesson(models.Model):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(
+        'users.User',
+        on_delete=models.CASCADE,
+        related_name='subscriptions'
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name='subscriptions'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'course')  # Одна подписка на пользователя и курс
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'

@@ -1,7 +1,14 @@
 from rest_framework import serializers
 
+from .models import Course, Lesson, Subscription
 from .validators import validate_youtube_link
-from .models import Course, Lesson
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = ['id', 'user', 'course', 'created_at']
+        read_only_fields = ['user', 'created_at']
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -36,6 +43,7 @@ class LessonShortSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     lessons = LessonShortSerializer(many=True, read_only=True, source="lessons_set")
     lessons_count = serializers.SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField()
 
     def validate(self, data):
         user = self.context['request'].user
@@ -45,7 +53,14 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ["id", "title", "preview", "description", "lessons_count", "lessons"]
+        fields = ["id", "title", "preview", "description", "lessons_count", "lessons", 'is_subscribed']
+
+    def get_is_subscribed(self, obj):
+        """Проверяет, подписан ли текущий пользователь на курс"""
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return Subscription.objects.filter(user=user, course=obj).exists()
+        return False
 
     def get_lessons_count(self, obj):
         return obj.lessons.count()
