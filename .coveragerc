@@ -1,0 +1,15 @@
+[run]
+source = .
+omit =
+    */migrations/*
+    */__init__.py
+    */tests/*
+    */admin.py
+    */apps.py
+    manage.py
+    lms_backend/wsgi.py
+    lms_backend/asgi.py
+
+[report]
+show_missing = True
+skip_covered = True
