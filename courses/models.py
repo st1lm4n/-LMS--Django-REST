@@ -1,6 +1,9 @@
 from django.db import models
 from rest_framework.permissions import IsAuthenticated
+
+from .validators import validate_youtube_link
 from .permissions import IsModeratorOrOwner
+
 
 class Course(models.Model):
     title = models.CharField(max_length=255)
@@ -29,7 +32,11 @@ class Lesson(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     preview = models.ImageField(upload_to="lesson_previews/", blank=True, null=True)
-    video_link = models.URLField(blank=True, null=True)
+    video_link = models.URLField(
+        blank=True,
+        null=True,
+        validators=[validate_youtube_link]  # Добавляем валидатор
+    )
     owner = models.ForeignKey(
         'users.User',
         on_delete=models.CASCADE,
