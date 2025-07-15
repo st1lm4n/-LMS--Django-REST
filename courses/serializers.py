@@ -22,6 +22,7 @@ class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = '__all__'
+        read_only_fields = ['owner']
         extra_kwargs = {
             'video_link': {'validators': [validate_youtube_link]}
         }
@@ -41,7 +42,7 @@ class LessonShortSerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
-    lessons = LessonShortSerializer(many=True, read_only=True, source="lessons_set")
+    lessons = LessonShortSerializer(many=True, read_only=True)
     lessons_count = serializers.SerializerMethodField()
     is_subscribed = serializers.SerializerMethodField()
 

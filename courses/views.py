@@ -1,20 +1,20 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, viewsets
 from rest_framework import status
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Course, Lesson
 from .models import Subscription
-from .permissions import IsModerator, IsOwner, IsModeratorOrOwner
+from .permissions import IsOwnerOrModerator
 from .serializers import CourseSerializer, LessonSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [IsAuthenticated, IsModeratorOrOwner]
+    permission_classes = [IsAuthenticated, IsOwnerOrModerator]
 
     def get_queryset(self):
         user = self.request.user
@@ -26,10 +26,10 @@ class CourseViewSet(viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
 
 
-class LessonListCreateAPIView(generics.ListCreateAPIView):
+class LessonViewSet(viewsets.ModelViewSet):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [IsAuthenticated, IsModeratorOrOwner]
+    permission_classes = [IsAuthenticated, IsOwnerOrModerator]
 
     def get_queryset(self):
         user = self.request.user
@@ -41,22 +41,17 @@ class LessonListCreateAPIView(generics.ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
 
-class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Lesson.objects.all()
-    serializer_class = LessonSerializer
-
-
 class SubscriptionAPIView(APIView):
     """Управление подписками на курсы"""
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        course_id = request.data.get('course_id')
+        course_id = request.data.get('course')
 
         if not course_id:
             return Response(
-                {"error": "course_id is required"},
+                {"error": "course is required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -75,3 +70,18 @@ class SubscriptionAPIView(APIView):
             status_code = status.HTTP_200_OK
 
         return Response({"message": message}, status=status_code)
+
+    def delete(self, request, *args, **kwargs):
+        user = request.user
+        course_id = request.data.get('course')
+
+        if not course_id:
+            return Response(
+                {"error": "course is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        course = get_object_or_404(Course, id=course_id)
+        subscription = get_object_or_404(Subscription, user=user, course=course)
+        subscription.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

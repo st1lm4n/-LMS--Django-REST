@@ -1,7 +1,5 @@
 from django.db import models
-from rest_framework.permissions import IsAuthenticated
 
-from .permissions import IsModeratorOrOwner
 from .validators import validate_youtube_link
 
 
@@ -15,16 +13,9 @@ class Course(models.Model):
         null=True,
         related_name='courses_owned'
     )
-    permission_classes = [IsAuthenticated, IsModeratorOrOwner]
 
-    def get_queryset(self):
-        user = self.request.user
-        if user.groups.filter(name='moderators').exists():
-            return Course.objects.all()
-        return Course.objects.filter(owner=user)
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+    def __str__(self):
+        return self.title
 
 
 class Lesson(models.Model):
@@ -43,16 +34,9 @@ class Lesson(models.Model):
         null=True,
         related_name='lessons_owned'
     )
-    permission_classes = [IsAuthenticated, IsModeratorOrOwner]
 
-    def get_queryset(self):
-        user = self.request.user
-        if user.groups.filter(name='moderators').exists():
-            return Course.objects.all()
-        return Course.objects.filter(owner=user)
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+    def __str__(self):
+        return self.title
 
 
 class Subscription(models.Model):
@@ -72,3 +56,6 @@ class Subscription(models.Model):
         unique_together = ('user', 'course')  # Одна подписка на пользователя и курс
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
+
+    def __str__(self):
+        return f'{self.user} подписан на {self.course}'

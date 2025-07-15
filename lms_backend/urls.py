@@ -24,16 +24,14 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from courses.views import (
     CourseViewSet,
-    LessonListCreateAPIView,
-    LessonRetrieveUpdateDestroyAPIView,
+    LessonViewSet,
 )
-from courses.views import CourseViewSet, LessonListCreateAPIView, LessonRetrieveUpdateDestroyAPIView
+from courses.views import CourseViewSet, LessonViewSet
 from users.views import PaymentViewSet, UserViewSet
 from users.views import UserRegistrationAPIView, CustomTokenObtainPairView
 from users.views import UserViewSet
 
 router = DefaultRouter()
-router.register(r"courses", CourseViewSet)
 router.register(r"users", UserViewSet)
 router.register(r"payments", PaymentViewSet)
 
@@ -42,8 +40,6 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/users/', include(('users.urls', 'users'), namespace='users')),
     path('api/courses/', include(('courses.urls', 'courses'), namespace='courses')),
-    path('api/lessons/', LessonListCreateAPIView.as_view()),
-    path('api/lessons/<int:pk>/', LessonRetrieveUpdateDestroyAPIView.as_view()),
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/register/', UserRegistrationAPIView.as_view(), name='register'),
