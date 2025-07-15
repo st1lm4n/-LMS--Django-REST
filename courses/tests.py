@@ -43,54 +43,24 @@ class LessonTestCase(APITestCase):
             owner=self.user
         )
 
+
     def test_lesson_create(self):
         """Тест создания урока"""
         url = reverse('courses:lesson-list')
-        data = {
-                'course': self.course.id,
-                'title': 'New Lesson',
-                'description': 'New Lesson Description'
-            }
-
-        self.client.force_authenticate(self.user)
-        response = self.client.post(url, data)
-
-        # Должно быть 201 Created, а не 400 Bad Request
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        # Дополнительная проверка: убедимся, что урок действительно создан
-        lesson = Lesson.objects.get(title='New Lesson')
-        self.assertEqual(lesson.description, 'New Lesson Description')
-
-    def test_lesson_create(self):
-        """Тест создания урока"""
-        url = '/api/courses/lessons/'
         data = {
             'course': self.course.id,
             'title': 'New Lesson',
             'description': 'New Lesson Description'
         }
 
-        # # 1. Проверка без аутентификации
-        # self.client.logout()
-        # response = self.client.post(url, data)
-        # self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-        # # 2. Проверка с обычным пользователем
-        # self.client.force_authenticate(self.user)
-        # response = self.client.post(url, data)
-        # print(response.content)  # Для диагностики
-        # self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        # # 3. Проверка с модератором
-        # self.client.force_authenticate(self.moderator)
-        # response = self.client.post(url, data)
-        # self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.client.force_authenticate(self.user)
+        response = self.client.post(url, data)
 
         # Для диагностики
         print("Response status:", response.status_code)
         print("Response content:", response.content)
 
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 
     def test_lesson_update_moderator(self):
