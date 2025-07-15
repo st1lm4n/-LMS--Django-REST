@@ -3,11 +3,12 @@ from rest_framework import generics, viewsets
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.routers import DefaultRouter
 from rest_framework.views import APIView
 
 from .models import Course, Lesson
 from .models import Subscription
-from .permissions import IsModerator, IsOwner, IsModeratorOrOwner
+from .permissions import IsModeratorOrOwner
 from .serializers import CourseSerializer, LessonSerializer
 
 
@@ -26,7 +27,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
 
 
-class LessonListCreateAPIView(generics.ListCreateAPIView):
+class LessonViewSet(viewsets.ModelViewSet):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsModeratorOrOwner]
@@ -75,3 +76,7 @@ class SubscriptionAPIView(APIView):
             status_code = status.HTTP_200_OK
 
         return Response({"message": message}, status=status_code)
+
+
+router = DefaultRouter()
+router.register(r'courses', CourseViewSet, basename='course')  # Добавьте basename
