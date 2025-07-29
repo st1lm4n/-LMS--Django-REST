@@ -1,10 +1,14 @@
+from datetime import timedelta
+
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from subscriptions.tasks import send_course_update
 from .models import Course, Lesson
 from .models import Subscription
 from .permissions import IsOwnerOrModerator
@@ -24,6 +28,20 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class CourseUpdateView(APIView):
+    def put(self, request, pk):
+        course = self.get_object(pk)
+        serializer = CourseSerializer(course, data=request.data)
+
+        # Проверка времени последнего обновления
+        if course.updated_at < timezone.now() - timedelta(hours=4):
+            serializer.is_valid(raise_exception=True)
+            course = serializer.save()
+            send_course_update.delay(course.id)  # Асинхронный вызов
+            return Response(serializer.data)
+        return Response(serializer.data)
 
 
 class LessonViewSet(viewsets.ModelViewSet):
