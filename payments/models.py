@@ -11,3 +11,4 @@ class Payment(models.Model):
     stripe_session_id = models.CharField(max_length=255, blank=True)
     status = models.CharField(max_length=20, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
+    payment_date = models.DateTimeField(auto_now_add=True)

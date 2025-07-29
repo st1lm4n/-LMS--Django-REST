@@ -3,7 +3,8 @@ from rest_framework import serializers
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import Payment, User
+from .models import User
+from payments.models import Payment
 
 
 class PaymentSerializer(serializers.ModelSerializer):

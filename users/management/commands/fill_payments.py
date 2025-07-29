@@ -4,7 +4,8 @@ from decimal import Decimal
 
 from courses.models import Course, Lesson
 from django.core.management.base import BaseCommand
-from users.models import Payment, User
+from users.models import User
+from payments.models import Payment
 
 
 class Command(BaseCommand):
