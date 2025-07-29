@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "django_filters",
     'rest_framework_simplejwt',
     'drf_spectacular',
+    'payments'
 ]
 
 MIDDLEWARE = [
@@ -148,7 +149,7 @@ STATIC_URL = "static/"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+DEFAULT_AUTO_FIELD = "django.db.models.py.BigAutoField"
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -166,3 +167,6 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
+
+STRIPE_SECRET_KEY=os.getenv('STRIPE_SECRET_KEY')
+STRIPE_PUBLIC_KEY=os.getenv('STRIPE_PUBLIC_KEY')
