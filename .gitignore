@@ -141,7 +141,6 @@ celerybeat.pid
 env/
 venv/
 .venv/
-.env
 
 ENV/
 env.bak/
@@ -211,3 +210,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Environment files
+*.env
+!.env.template
