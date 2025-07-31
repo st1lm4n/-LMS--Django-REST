@@ -25,7 +25,6 @@ class PaymentHistorySerializer(serializers.ModelSerializer):
             "course_title",
             "lesson_title",
             "amount",
-            "payment_method",
         ]
 
 
