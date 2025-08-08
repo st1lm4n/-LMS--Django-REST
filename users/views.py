@@ -8,7 +8,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 
 from .filters import PaymentFilter
-from .models import Payment, User
+from .models import User
+from payments.models import Payment
 from .permissions import IsOwner
 from .serializers import PaymentSerializer, UserSerializer
 from .serializers import UserProfileSerializer, UserDetailSerializer
