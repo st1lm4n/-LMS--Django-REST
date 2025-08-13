@@ -33,7 +33,8 @@ DEBUG = os.getenv('DEBUG') == 'True'
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'testserver'
+    'testserver',
+    '130.193.43.59',
 ]
 
 # Application definition
