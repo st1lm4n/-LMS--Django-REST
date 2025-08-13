@@ -1,8 +1,9 @@
-# Используем многоэтапную сборку
+# Этап сборки
 FROM python:3.11-slim as builder
 
+# Установка зависимостей для сборки
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
     gcc \
     python3-dev \
     libpq-dev \
@@ -15,6 +16,12 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 
 # Финальный образ
 FROM python:3.11-slim
+
+# Установка runtime-зависимостей
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY --from=builder /root/.local /root/.local
