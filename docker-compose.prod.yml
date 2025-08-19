@@ -1,16 +1,22 @@
-version: '3.8'
-
 services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   web:
     build: .
     command: gunicorn --bind 0.0.0.0:8000 lms.wsgi:application
-    restart: always
     env_file:
       - .env
     volumes:
-      - static_volume:/app/static
-    expose:
-      - 8000
+      - static_volume:/app/staticfiles
+    depends_on:
+      - db
 
   nginx:
     image: nginx:1.25-alpine
@@ -23,4 +29,5 @@ services:
       - web
 
 volumes:
+  postgres_data:
   static_volume:
