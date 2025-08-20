@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [develop]
+    branches: [ develop ]
 
 jobs:
   test:
@@ -26,7 +26,7 @@ jobs:
         env:
           DEBUG: 0
           SECRET_KEY: ${{ secrets.TEST_SECRET_KEY }}
-          DATABASE_URL: sqlite:///:memory:
+          DATABASE_URL: sqlite:///:memory
 
   deploy:
     needs: test
@@ -45,5 +45,13 @@ jobs:
           script: |
             cd /opt/lms
             git pull origin develop
+            
+            # Проверяем существование .env
+            if [ ! -f .env ]; then
+              cp .env.example .env
+              echo "Warning: .env created from example. Please fill real values!"
+            fi
+            
             docker-compose -f docker-compose.prod.yml down
             docker-compose -f docker-compose.prod.yml up -d --build
+            docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --noinput
