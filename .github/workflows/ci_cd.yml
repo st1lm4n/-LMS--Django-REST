@@ -15,6 +15,7 @@ jobs:
 
     - name: Check required files exist
       run: |
+        echo "Current directory structure:"
         ls -la
         echo "Checking if requirements.txt exists..."
         if [ ! -f "requirements.txt" ]; then
@@ -22,6 +23,12 @@ jobs:
           exit 1
         fi
         echo "requirements.txt found successfully"
+        echo "Checking if Dockerfile exists..."
+        if [ ! -f "Dockerfile" ]; then
+          echo "ERROR: Dockerfile not found!"
+          exit 1
+        fi
+        echo "Dockerfile found successfully"
 
     - name: Set up Python
       uses: actions/setup-python@v4

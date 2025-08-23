@@ -10,9 +10,9 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Копируем только requirements.txt сначала для кэширования зависимостей
-COPY requirements.txt /tmp/requirements.txt
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
+# Копируем requirements.txt в рабочую директорию
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Затем копируем весь остальной код
 COPY . .
