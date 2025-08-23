@@ -5,6 +5,7 @@ from django.utils import timezone
 
 User = get_user_model()
 
+
 @shared_task
 def check_inactive_users():
     month_ago = timezone.now() - timedelta(days=30)

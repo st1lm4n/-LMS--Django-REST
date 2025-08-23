@@ -3,8 +3,8 @@ from django.contrib.auth.models import Group
 
 
 class Command(BaseCommand):
-    help = 'Creates moderator group'
+    help = "Creates moderator group"
 
     def handle(self, *args, **options):
-        Group.objects.get_or_create(name='moderators')
-        self.stdout.write(self.style.SUCCESS('Groups created successfully'))
+        Group.objects.get_or_create(name="moderators")
+        self.stdout.write(self.style.SUCCESS("Groups created successfully"))

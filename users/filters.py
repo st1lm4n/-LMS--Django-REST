@@ -14,16 +14,12 @@ class PaymentFilter(django_filters.FilterSet):
             "-payment_date": "По дате (убывание)",
         },
     )
-    course = django_filters.NumberFilter(field_name='course__id', label='Course ID')
-    lesson = django_filters.NumberFilter(field_name='lesson__id', label='Lesson ID')
-    payment_method = django_filters.CharFilter(field_name='payment_method', lookup_expr='iexact')
+    course = django_filters.NumberFilter(field_name="course__id", label="Course ID")
+    lesson = django_filters.NumberFilter(field_name="lesson__id", label="Lesson ID")
+    payment_method = django_filters.CharFilter(
+        field_name="payment_method", lookup_expr="iexact"
+    )
 
     class Meta:
         model = Payment
-        fields = [
-            'payment_date',
-            'amount',
-            'payment_method',
-            'course',
-            'lesson'
-        ]
+        fields = ["payment_date", "amount", "payment_method", "course", "lesson"]

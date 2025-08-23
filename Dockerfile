@@ -16,11 +16,10 @@ WORKDIR /app
 
 # Создаем директорию для статических файлов
 RUN mkdir -p /app/staticfiles
-
-RUN pip install --upgrade pip
+&& pip install --upgrade pip
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-RUN pip install gunicorn==21.2.0  # Явная установка
+&& pip install gunicorn==21.2.0
 
 COPY . .
 
