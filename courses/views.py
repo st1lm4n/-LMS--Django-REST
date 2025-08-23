@@ -22,7 +22,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.groups.filter(name='moderators').exists():
+        if user.groups.filter(name="moderators").exists():
             return Course.objects.all()
         return Course.objects.filter(owner=user)
 
@@ -51,7 +51,7 @@ class LessonViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.groups.filter(name='moderators').exists():
+        if user.groups.filter(name="moderators").exists():
             return Lesson.objects.all()
         return Lesson.objects.filter(owner=user)
 
@@ -61,42 +61,40 @@ class LessonViewSet(viewsets.ModelViewSet):
 
 class SubscriptionAPIView(APIView):
     """Управление подписками на курсы"""
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        course_id = request.data.get('course')
+        course_id = request.data.get("course")
 
         if not course_id:
             return Response(
-                {"error": "course is required"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "course is required"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         course = get_object_or_404(Course, id=course_id)
         subscription, created = Subscription.objects.get_or_create(
-            user=user,
-            course=course
+            user=user, course=course
         )
 
         if created:
-            message = 'Вы подписались на обновления курса'
+            message = "Вы подписались на обновления курса"
             status_code = status.HTTP_201_CREATED
         else:
             subscription.delete()
-            message = 'Вы отписались от курса'
+            message = "Вы отписались от курса"
             status_code = status.HTTP_200_OK
 
         return Response({"message": message}, status=status_code)
 
     def delete(self, request, *args, **kwargs):
         user = request.user
-        course_id = request.data.get('course')
+        course_id = request.data.get("course")
 
         if not course_id:
             return Response(
-                {"error": "course is required"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "course is required"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         course = get_object_or_404(Course, id=course_id)

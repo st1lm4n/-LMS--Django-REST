@@ -18,43 +18,36 @@ class BaseTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         # Создаем группы с проверкой существования
-        cls.moderator_group, created = Group.objects.get_or_create(name='moderators')
+        cls.moderator_group, created = Group.objects.get_or_create(name="moderators")
 
         # Создаем пользователей с уникальными email
         cls.user = User.objects.create_user(
-            email=f'user_{uuid.uuid4()}@example.com',
-            password='password'
+            email=f"user_{uuid.uuid4()}@example.com", password="password"
         )
         cls.moderator = User.objects.create_user(
-            email=f'moderator_{uuid.uuid4()}@example.com',
-            password='password'
+            email=f"moderator_{uuid.uuid4()}@example.com", password="password"
         )
         cls.moderator.groups.add(cls.moderator_group)
 
         # Создаем курс
         cls.course = Course.objects.create(
-            title='Test Course',
-            description='Test Course Description',
-            owner=cls.user
+            title="Test Course", description="Test Course Description", owner=cls.user
         )
 
         # Создаем урок
         cls.lesson = Lesson.objects.create(
             course=cls.course,
-            title='Test Lesson',
-            description='Test Lesson Description',
-            owner=cls.user
+            title="Test Lesson",
+            description="Test Lesson Description",
+            owner=cls.user,
         )
 
 
 class CourseTestCase(BaseTestCase):
     def test_course_create(self):
         """Тест создания курса"""
-        url = reverse('courses:course-list')
-        data = {
-            'title': 'New Course',
-            'description': 'New Course Description'
-        }
+        url = reverse("courses:course-list")
+        data = {"title": "New Course", "description": "New Course Description"}
 
         # Анонимный пользователь
         response = self.client.post(url, data)
@@ -73,7 +66,7 @@ class CourseTestCase(BaseTestCase):
 
     def test_course_list(self):
         """Тест получения списка курсов"""
-        url = reverse('courses:course-list')
+        url = reverse("courses:course-list")
 
         # Анонимный пользователь
         response = self.client.get(url)
@@ -83,11 +76,11 @@ class CourseTestCase(BaseTestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.json()['results']), 1)
+        self.assertEqual(len(response.json()["results"]), 1)
 
     def test_course_detail(self):
         """Тест детального просмотра курса"""
-        url = reverse('courses:course-detail', args=[self.course.id])
+        url = reverse("courses:course-detail", args=[self.course.id])
 
         # Анонимный пользователь
         response = self.client.get(url)
@@ -97,7 +90,7 @@ class CourseTestCase(BaseTestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json()['title'], 'Test Course')
+        self.assertEqual(response.json()["title"], "Test Course")
 
         # Модератор
         self.client.force_authenticate(user=self.moderator)
@@ -106,8 +99,8 @@ class CourseTestCase(BaseTestCase):
 
     def test_course_update(self):
         """Тест обновления курса"""
-        url = reverse('courses:course-detail', args=[self.course.id])
-        data = {'title': 'Updated Course Title'}
+        url = reverse("courses:course-detail", args=[self.course.id])
+        data = {"title": "Updated Course Title"}
 
         # Анонимный пользователь
         response = self.client.patch(url, data)
@@ -115,8 +108,7 @@ class CourseTestCase(BaseTestCase):
 
         # Обычный пользователь (не владелец)
         other_user = User.objects.create_user(
-            email=f'other_{uuid.uuid4()}@example.com',
-            password='password'
+            email=f"other_{uuid.uuid4()}@example.com", password="password"
         )
         self.client.force_authenticate(user=other_user)
         response = self.client.patch(url, data)
@@ -127,7 +119,7 @@ class CourseTestCase(BaseTestCase):
         response = self.client.patch(url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.course.refresh_from_db()
-        self.assertEqual(self.course.title, 'Updated Course Title')
+        self.assertEqual(self.course.title, "Updated Course Title")
 
         # Модератор
         self.client.force_authenticate(user=self.moderator)
@@ -136,7 +128,7 @@ class CourseTestCase(BaseTestCase):
 
     def test_course_delete(self):
         """Тест удаления курса"""
-        url = reverse('courses:course-detail', args=[self.course.id])
+        url = reverse("courses:course-detail", args=[self.course.id])
 
         # Анонимный пользователь
         response = self.client.delete(url)
@@ -144,8 +136,7 @@ class CourseTestCase(BaseTestCase):
 
         # Обычный пользователь (не владелец)
         other_user = User.objects.create_user(
-            email=f'other_{uuid.uuid4()}@example.com',
-            password='password'
+            email=f"other_{uuid.uuid4()}@example.com", password="password"
         )
         self.client.force_authenticate(user=other_user)
         response = self.client.delete(url)
@@ -161,11 +152,11 @@ class CourseTestCase(BaseTestCase):
 class LessonTestCase(BaseTestCase):
     def test_lesson_create(self):
         """Тест создания урока"""
-        url = reverse('courses:lesson-list')
+        url = reverse("courses:lesson-list")
         data = {
-            'course': self.course.id,
-            'title': 'New Lesson',
-            'description': 'New Lesson Description'
+            "course": self.course.id,
+            "title": "New Lesson",
+            "description": "New Lesson Description",
         }
 
         # Анонимный пользователь
@@ -185,7 +176,7 @@ class LessonTestCase(BaseTestCase):
 
     def test_lesson_list(self):
         """Тест получения списка уроков"""
-        url = reverse('courses:lesson-list')
+        url = reverse("courses:lesson-list")
 
         # Анонимный пользователь
         response = self.client.get(url)
@@ -195,11 +186,11 @@ class LessonTestCase(BaseTestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.json()['results']), 1)
+        self.assertEqual(len(response.json()["results"]), 1)
 
     def test_lesson_detail(self):
         """Тест детального просмотра урока"""
-        url = reverse('courses:lesson-detail', args=[self.lesson.id])
+        url = reverse("courses:lesson-detail", args=[self.lesson.id])
 
         # Анонимный пользователь
         response = self.client.get(url)
@@ -209,7 +200,7 @@ class LessonTestCase(BaseTestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json()['title'], 'Test Lesson')
+        self.assertEqual(response.json()["title"], "Test Lesson")
 
         # Модератор
         self.client.force_authenticate(user=self.moderator)
@@ -218,8 +209,8 @@ class LessonTestCase(BaseTestCase):
 
     def test_lesson_update(self):
         """Тест обновления урока"""
-        url = reverse('courses:lesson-detail', args=[self.lesson.id])
-        data = {'title': 'Updated Lesson Title'}
+        url = reverse("courses:lesson-detail", args=[self.lesson.id])
+        data = {"title": "Updated Lesson Title"}
 
         # Анонимный пользователь
         response = self.client.patch(url, data)
@@ -227,8 +218,7 @@ class LessonTestCase(BaseTestCase):
 
         # Обычный пользователь (не владелец)
         other_user = User.objects.create_user(
-            email=f'other_{uuid.uuid4()}@example.com',
-            password='password'
+            email=f"other_{uuid.uuid4()}@example.com", password="password"
         )
         self.client.force_authenticate(user=other_user)
         response = self.client.patch(url, data)
@@ -239,7 +229,7 @@ class LessonTestCase(BaseTestCase):
         response = self.client.patch(url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.lesson.refresh_from_db()
-        self.assertEqual(self.lesson.title, 'Updated Lesson Title')
+        self.assertEqual(self.lesson.title, "Updated Lesson Title")
 
         # Модератор
         self.client.force_authenticate(user=self.moderator)
@@ -248,7 +238,7 @@ class LessonTestCase(BaseTestCase):
 
     def test_lesson_delete(self):
         """Тест удаления урока"""
-        url = reverse('courses:lesson-detail', args=[self.lesson.id])
+        url = reverse("courses:lesson-detail", args=[self.lesson.id])
 
         # Анонимный пользователь
         response = self.client.delete(url)
@@ -256,8 +246,7 @@ class LessonTestCase(BaseTestCase):
 
         # Обычный пользователь (не владелец)
         other_user = User.objects.create_user(
-            email=f'other_{uuid.uuid4()}@example.com',
-            password='password'
+            email=f"other_{uuid.uuid4()}@example.com", password="password"
         )
         self.client.force_authenticate(user=other_user)
         response = self.client.delete(url)
@@ -273,8 +262,8 @@ class LessonTestCase(BaseTestCase):
 class SubscriptionTestCase(BaseTestCase):
     def test_subscription_create_delete(self):
         """Тест создания и удаления подписки"""
-        url = reverse('courses:subscription-list')
-        data = {'course': self.course.id}
+        url = reverse("courses:subscription-list")
+        data = {"course": self.course.id}
 
         # Анонимный пользователь
         response = self.client.post(url, data)
@@ -286,23 +275,23 @@ class SubscriptionTestCase(BaseTestCase):
         # Создаем подписку
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Subscription.objects.filter(user=self.user, course=self.course).exists())
+        self.assertTrue(
+            Subscription.objects.filter(user=self.user, course=self.course).exists()
+        )
 
         # Удаляем подписку
         response = self.client.delete(url, data)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
-
-
 class ModelTestCase(BaseTestCase):
     def test_course_str(self):
         """Тест строкового представления курса"""
-        self.assertEqual(str(self.course), 'Test Course')
+        self.assertEqual(str(self.course), "Test Course")
 
     def test_lesson_str(self):
         """Тест строкового представления урока"""
-        self.assertEqual(str(self.lesson), 'Test Lesson')
+        self.assertEqual(str(self.lesson), "Test Lesson")
 
     def test_subscription_str(self):
         """Тест строкового представления подписки"""
@@ -310,5 +299,5 @@ class ModelTestCase(BaseTestCase):
             user=self.user,
             course=self.course,
         )
-        expected_str = f'{self.user} подписан на {self.course}'
+        expected_str = f"{self.user} подписан на {self.course}"
         self.assertEqual(str(subscription), expected_str)

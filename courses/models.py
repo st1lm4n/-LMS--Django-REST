@@ -8,10 +8,7 @@ class Course(models.Model):
     preview = models.ImageField(upload_to="course_previews/", blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     owner = models.ForeignKey(
-        'users.User',
-        on_delete=models.CASCADE,
-        null=True,
-        related_name='courses_owned'
+        "users.User", on_delete=models.CASCADE, null=True, related_name="courses_owned"
     )
 
     def __str__(self):
@@ -24,15 +21,10 @@ class Lesson(models.Model):
     description = models.TextField(blank=True, null=True)
     preview = models.ImageField(upload_to="lesson_previews/", blank=True, null=True)
     video_link = models.URLField(
-        blank=True,
-        null=True,
-        validators=[validate_youtube_link]  # Добавляем валидатор
+        blank=True, null=True, validators=[validate_youtube_link]  # Добавляем валидатор
     )
     owner = models.ForeignKey(
-        'users.User',
-        on_delete=models.CASCADE,
-        null=True,
-        related_name='lessons_owned'
+        "users.User", on_delete=models.CASCADE, null=True, related_name="lessons_owned"
     )
 
     def __str__(self):
@@ -41,21 +33,17 @@ class Lesson(models.Model):
 
 class Subscription(models.Model):
     user = models.ForeignKey(
-        'users.User',
-        on_delete=models.CASCADE,
-        related_name='subscriptions'
+        "users.User", on_delete=models.CASCADE, related_name="subscriptions"
     )
     course = models.ForeignKey(
-        Course,
-        on_delete=models.CASCADE,
-        related_name='subscriptions'
+        Course, on_delete=models.CASCADE, related_name="subscriptions"
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('user', 'course')  # Одна подписка на пользователя и курс
-        verbose_name = 'Подписка'
-        verbose_name_plural = 'Подписки'
+        unique_together = ("user", "course")  # Одна подписка на пользователя и курс
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"
 
     def __str__(self):
-        return f'{self.user} подписан на {self.course}'
+        return f"{self.user} подписан на {self.course}"
