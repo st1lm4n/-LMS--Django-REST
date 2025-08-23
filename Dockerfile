@@ -1,27 +1,24 @@
-FROM python:3.11
-
-# Установка системных зависимостей
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    gcc \
-    libpq-dev \
-    libpq5 \
-    && rm -rf /var/lib/apt/lists/*
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV SECRET_KEY=temp_secret_key_for_build
+FROM python:3.10-slim
 
 WORKDIR /app
 
-# Создаем директорию для статических файлов
-RUN mkdir -p /app/staticfiles
-&& pip install --upgrade pip
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-&& pip install gunicorn==21.2.0
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Копируем только requirements.txt сначала для кэширования зависимостей
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Затем копируем весь остальной код
 COPY . .
 
-# Запускаем collectstatic
 RUN python manage.py collectstatic --noinput
+
+EXPOSE 8000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "lms.wsgi:application"]

@@ -13,6 +13,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Check required files exist
+      run: |
+        ls -la
+        echo "Checking if requirements.txt exists..."
+        if [ ! -f "requirements.txt" ]; then
+          echo "ERROR: requirements.txt not found!"
+          exit 1
+        fi
+        echo "requirements.txt found successfully"
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
