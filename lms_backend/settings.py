@@ -14,6 +14,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+import dj_database_url
 from celery.schedules import crontab
 from dotenv import load_dotenv
 
@@ -35,6 +36,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "testserver",
     "130.193.43.59",
+    "158.160.21.205",
 ]
 
 # Application definition
@@ -183,4 +185,13 @@ CELERY_BEAT_SCHEDULE = {
         "task": "users.tasks.check_inactive_users",
         "schedule": crontab(hour=0, minute=0),  # Ежедневно в полночь
     },
+}
+
+# Database
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }

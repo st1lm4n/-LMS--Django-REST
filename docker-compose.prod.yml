@@ -20,7 +20,10 @@ services:
 
   web:
     build: .
-    command: gunicorn --bind 0.0.0.0:8000 lms.wsgi:application
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput &&
+             gunicorn --bind 0.0.0.0:8000 lms.wsgi:application"
     env_file:
       - .env
     volumes:
@@ -28,8 +31,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-        redis:
-          condition: service_healthy
+      redis:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8000/health/" ]
       interval: 30s
