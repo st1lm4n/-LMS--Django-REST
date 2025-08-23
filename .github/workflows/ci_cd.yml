@@ -9,30 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_DB: test_db
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_password
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-      redis:
-        image: redis:7-alpine
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
 
     steps:
     - uses: actions/checkout@v4
@@ -47,22 +23,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run migrations
+    - name: Run tests with SQLite
       env:
-        DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
         SECRET_KEY: test-secret-key-for-ci-cd
         DEBUG: "True"
-      run: |
-        python manage.py migrate
-
-    - name: Run tests
-      env:
-        DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
-        REDIS_URL: redis://localhost:6379/0
-        SECRET_KEY: test-secret-key-for-ci-cd
-        DEBUG: "True"
-        CELERY_BROKER_URL: redis://localhost:6379/0
-        CELERY_RESULT_BACKEND: redis://localhost:6379/0
       run: |
         python manage.py test
 
@@ -84,6 +48,9 @@ jobs:
     if: github.ref == 'refs/heads/develop'
 
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
     - name: Deploy to server
       uses: appleboy/ssh-action@v1.0.0
       with:
